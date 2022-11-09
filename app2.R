@@ -37,9 +37,9 @@ ui <- fluidPage(
 server <- function(input, output) {
   
   Chocolate <- read_csv("chocolate_bars.csv")
- # y <- reactive({Chocolate %>%
-  #    filter(percentage == input$percentage) %>%
-   #   count(Chocolate$rating, input$percentage)})
+   y <- reactive({Chocolate %>%
+    filter(percentage == input$percentage) %>%
+   count(Chocolate$rating, input$percentage)})
 
   y<-reactive({input$percentage})
   output$distPlot <- renderPlot({
