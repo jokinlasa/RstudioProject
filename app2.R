@@ -1,6 +1,7 @@
 library(shiny)
 library(readr)
 library(dplyr)
+library(ggplot2)
 
 # Define UI for app that draws a histogram ----
 ui <- fluidPage(
@@ -27,30 +28,25 @@ ui <- fluidPage(
     mainPanel(
       
       # Output: Histogram ----
-      plotOutput(outputId = "distPlot")
+      plotOutput(outputId = "plot")
       
     )
   )
 )
 
+Chocolate <- read_csv("chocolate_bars.csv")
+
 # Define server logic required to draw a histogram ----
 server <- function(input, output) {
   
-  Chocolate <- read_csv("chocolate_bars.csv")
-   y <- reactive({Chocolate %>%
-    filter(percentage == input$percentage) %>%
-   count(Chocolate$rating, input$percentage)})
-
-  y<-reactive({input$percentage})
-  output$distPlot <- renderPlot({
-    therating <- Chocolate$rating
-    therating <- na.omit(therating)
-
-    
-    hist(x=therating, breaks = y, col = "#75AADB", border = "black",
-         xlab = "rating",
-         main = "Histogram of how many rating")
-    
+#  ratings <- reactive({
+   # percentage <- input$percentage
+  #})
+  data <- reactive({filter(Chocolate,
+                           cocoa_percent == input$percentage)})
+  
+  output$plot <- renderPlot({
+       ggplot(data(), aes(x=rating)) + geom_histogram()
   })
   
 }
