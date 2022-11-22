@@ -1,54 +1,46 @@
-####################################
-# Data Professor                   #
-# http://youtube.com/dataprofessor #
-# http://github.com/dataprofessor  #
-####################################
-
-# Modified from Winston Chang, 
-# https://shiny.rstudio.com/gallery/shiny-theme-selector.html
-
-# Concepts about Reactive programming used by Shiny, 
-# https://shiny.rstudio.com/articles/reactivity-overview.html
 
 # Load R packages
 library(shiny)
-library(shinythemes)
-
+library(rgdal)
+library(leaflet)
+library(readr)
+library(dplyr)
+library(ggplot2)
+Chocolate <- read_csv("chocolate_bars.csv")
 
 # Define UI
-ui <- fluidPage(theme = shinytheme("cerulean"),
-                navbarPage(
-                  # theme = "cerulean",  # <--- To use a theme, uncomment this
-                  "My first app",
-                  tabPanel("Navbar 1",
+ui <- fluidPage(navbarPage(
+                  "Chocolate",
+                  tabPanel("Rating",
                            sidebarPanel(
-                             tags$h3("Input:"),
-                             textInput("txt1", "Given Name:", ""),
-                             textInput("txt2", "Surname:", ""),
-                             
+                             sliderInput(inputId = "percentage",
+                                         label = "cocoa percentage:",
+                                         min = min(Chocolate$cocoa_percent),
+                                         max = max(Chocolate$cocoa_percent),
+                                         value =  c(45, 50))
                            ), # sidebarPanel
                            mainPanel(
-                             h1("Header 1"),
-                             
-                             h4("Output 1"),
-                             verbatimTextOutput("txtout"),
+                             plotOutput(outputId = "plot")
                              
                            ) # mainPanel
                            
                   ), # Navbar 1, tabPanel
-                  tabPanel("Navbar 2", "This panel is intentionally left blank"),
-                  tabPanel("Navbar 3", "This panel is intentionally left blank")
+                  tabPanel("Location"),
+                  tabPanel("ingredients", "This panel is intentionally left blank")
                   
-                ) # navbarPage
+                )
 ) # fluidPage
 
 
 # Define server function  
 server <- function(input, output) {
   
-  output$txtout <- renderText({
-    paste( input$txt1, input$txt2, sep = " " )
+  data <- reactive({Chocolate %>% filter(between (cocoa_percent,input$percentage[1], input$percentage[2]))})
+  
+  output$plot <- renderPlot({
+    ggplot(data(), aes(x=rating)) + geom_histogram()
   })
+  
 } # server
 
 
